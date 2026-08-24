@@ -172,10 +172,14 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border:0;border-radiu
 .warn div{font-size:12.5px;color:var(--ink-65);line-height:1.45}
 .warn p{margin:0 0 4px}
 .warn p:last-child{margin:0}
-.card-links{display:flex;gap:4px;margin:14px -8px -6px;margin-top:auto;padding-top:6px}
-.lnk{display:inline-flex;align-items:center;gap:5px;font-size:13.5px;color:var(--blue);text-decoration:none;
-  padding:8px;border-radius:var(--r);border:0;background:none;font-family:inherit;cursor:pointer}
-.lnk:hover{background:var(--hover)}
+.card-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:auto;padding-top:14px}
+.cta{display:inline-flex;align-items:center;gap:7px;font-family:inherit;font-size:13.5px;font-weight:500;
+  color:var(--ink);text-decoration:none;white-space:nowrap;padding:8px 12px;border-radius:4px;
+  border:1px solid var(--line-2);background:var(--paper);box-shadow:rgba(15,15,15,.05) 0 1px 2px;cursor:pointer}
+.cta:hover{background:var(--paper-2)}
+.cta svg{width:14px;height:14px;flex:0 0 auto}
+.cta-airbnb:hover{border-color:rgba(255,90,95,.6)}
+.cta-maps:hover{border-color:rgba(66,133,244,.6)}
 .empty{font-size:15px;color:var(--ink-50);padding:24px 0}
 .legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--ink-50);margin-top:14px}
 .legend span{display:inline-flex;align-items:center;gap:6px}
@@ -207,7 +211,7 @@ details.tog:first-of-type{border-top:1px solid var(--line)}
 .alt-head span{font-size:12.5px;color:var(--ink-50);flex:0 0 auto;font-variant-numeric:tabular-nums}
 .alt-why{font-size:15px;color:var(--ink);margin:8px 0 0}
 .alt-txt{font-size:14.5px;color:var(--ink-65);margin:7px 0 0;max-width:62ch}
-.alt-links{display:flex;gap:4px;margin:8px -8px -8px}
+.alt-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
 
 table{width:100%;border-collapse:collapse;font-size:14px;margin-top:14px}
 th,td{text-align:left;padding:7px 10px;border:1px solid var(--line-2)}
@@ -293,7 +297,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
 <aside class="callout">
   <div class="callout-i" aria-hidden="true">💡</div>
   <div>
-    <p>Abra <span class="kbd">Ajustar</span> na barra acima para mudar nº de pessoas, gasto com comida e preço do combustível. Os cartões recalculam na hora.</p>
+    <p>Abra <span class="kbd">Ajustar</span> na barra abaixo para mudar nº de pessoas, gasto com comida e preço do combustível. Os cartões recalculam na hora.</p>
   </div>
 </aside>
 </div>
@@ -553,7 +557,8 @@ const FOTOS = {"st1":["hosting/Hosting-1429007931808852716/original/88d426b0-a33
 
 const NIGHTS = 4, DAYS = 4;
 const I = {
-  ext:'<svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8 8 3M3.7 3H8v4.3"/></svg>',
+  airbnb:'<svg viewBox="0 0 24 24" fill="#FF5A5F" aria-hidden="true"><path d="M12.001 18.275c-1.353-1.697-2.148-3.184-2.413-4.457-.263-1.027-.16-1.848.291-2.465.477-.71 1.188-1.056 2.121-1.056s1.643.345 2.12 1.063c.446.61.558 1.432.286 2.465-.291 1.298-1.085 2.785-2.412 4.458zm9.601 1.14c-.185 1.246-1.034 2.28-2.2 2.783-2.253.98-4.483-.583-6.392-2.704 3.157-3.951 3.74-7.028 2.385-9.018-.795-1.14-1.933-1.695-3.394-1.695-2.944 0-4.563 2.49-3.927 5.382.37 1.565 1.352 3.343 2.917 5.332-.98 1.085-1.91 1.856-2.732 2.333-.636.344-1.245.558-1.828.609-2.679.399-4.778-2.2-3.825-4.88.132-.345.395-.98.845-1.961l.025-.053c1.464-3.178 3.242-6.79 5.285-10.795l.053-.132.58-1.116c.45-.822.635-1.19 1.351-1.643.346-.21.77-.315 1.246-.315.954 0 1.698.558 2.016 1.007.158.239.345.557.582.953l.558 1.089.08.159c2.041 4.004 3.821 7.608 5.279 10.794l.026.025.533 1.22.318.764c.243.613.294 1.222.213 1.858zm1.22-2.39c-.186-.583-.505-1.271-.9-2.094v-.03c-1.889-4.006-3.642-7.608-5.307-10.844l-.111-.163C15.317 1.461 14.468 0 12.001 0c-2.44 0-3.476 1.695-4.535 3.898l-.081.16c-1.669 3.236-3.421 6.843-5.303 10.847v.053l-.559 1.22c-.21.504-.317.768-.345.847C-.172 20.74 2.611 24 5.98 24c.027 0 .132 0 .265-.027h.372c1.75-.213 3.554-1.325 5.384-3.317 1.829 1.989 3.635 3.104 5.382 3.317h.372c.133.027.239.027.265.027 3.37.003 6.152-3.261 4.802-6.975z"/></svg>',
+  maps:'<svg viewBox="0 0 24 24" fill="#4285F4" aria-hidden="true"><path d="M19.527 4.799c1.212 2.608.937 5.678-.405 8.173-1.101 2.047-2.744 3.74-4.098 5.614-.619.858-1.244 1.75-1.669 2.727-.141.325-.263.658-.383.992-.121.333-.224.673-.34 1.008-.109.314-.236.684-.627.687h-.007c-.466-.001-.579-.53-.695-.887-.284-.874-.581-1.713-1.019-2.525-.51-.944-1.145-1.817-1.79-2.671L19.527 4.799zM8.545 7.705l-3.959 4.707c.724 1.54 1.821 2.863 2.871 4.18.247.31.494.622.737.936l4.984-5.925-.029.01c-1.741.601-3.691-.291-4.392-1.987a3.377 3.377 0 0 1-.209-.716c-.063-.437-.077-.761-.004-1.198l.001-.007zM5.492 3.149l-.003.004c-1.947 2.466-2.281 5.88-1.117 8.77l4.785-5.689-.058-.05-3.607-3.035zM14.661.436l-3.838 4.563a.295.295 0 0 1 .027-.01c1.6-.551 3.403.15 4.22 1.626.176.319.323.683.377 1.045.068.446.085.773.012 1.22l-.003.016 3.836-4.561A8.382 8.382 0 0 0 14.67.439l-.009-.003zM9.466 5.868L14.162.285l-.047-.012A8.31 8.31 0 0 0 11.986 0a8.439 8.439 0 0 0-6.169 2.766l-.016.018 3.665 3.084z"/></svg>',
   warn:'<svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M7 2.2 12.6 11.8H1.4z" stroke-linejoin="round"/><path d="M7 5.9v2.5M7 10.2h.01"/></svg>',
   star:'<svg width="11" height="11" viewBox="0 0 12 12" fill="currentColor"><path d="M6 .8l1.6 3.3 3.6.5-2.6 2.6.6 3.6L6 9.1 2.8 10.8l.6-3.6L.8 4.6l3.6-.5z"/></svg>',
   tri:'<svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><path d="M3 1.4 7.3 5 3 8.6z"/></svg>',
@@ -671,9 +676,8 @@ function card(c){
     <div class="tags">${tags.join("")}</div>
     ${c.warn.length?`<div class="warn">${I.warn}<div>${c.warn.map(x=>`<p>${x}</p>`).join("")}</div></div>`:""}
     <div class="card-links">
-      ${gal.length?`<button class="lnk" data-gal="${c.id}">${I.fotos}${gal.length} fotos</button>`:""}
-      <a class="lnk" href="${c.link}" target="_blank" rel="noopener">Ver no Airbnb${I.ext}</a>
-      <a class="lnk" href="${c.maps}" target="_blank" rel="noopener">Rota${I.ext}</a>
+      <a class="cta cta-airbnb" href="${c.link}" target="_blank" rel="noopener">${I.airbnb}Ver no Airbnb</a>
+      <a class="cta cta-maps" href="${c.maps}" target="_blank" rel="noopener">${I.maps}Rota</a>
     </div>
   </article>`;
 }
@@ -722,8 +726,8 @@ document.getElementById("alts").innerHTML = alts.map(a=>`
     <p class="alt-why">${a.why}</p>
     <p class="alt-txt">${a.txt}</p>
     <div class="alt-links">
-      <a class="lnk" href="${a.s}" target="_blank" rel="noopener">Casas no Airbnb${I.ext}</a>
-      <a class="lnk" href="${a.m}" target="_blank" rel="noopener">Rota${I.ext}</a>
+      <a class="cta cta-airbnb" href="${a.s}" target="_blank" rel="noopener">${I.airbnb}Casas no Airbnb</a>
+      <a class="cta cta-maps" href="${a.m}" target="_blank" rel="noopener">${I.maps}Rota</a>
     </div>
   </div>`).join("");
 

@@ -96,6 +96,13 @@ h1{font-size:36px;line-height:1.2;letter-spacing:-.022em;font-weight:700}
 .controls.open{display:block}
 .controls-in{max-width:708px;margin:0 auto;padding:16px 24px 18px}
 .ctrl-grid{display:grid;gap:14px 24px}
+.ctrl-seg{grid-column:1/-1;align-self:start}
+.seg{display:flex;align-items:center;gap:2px;background:rgba(55,53,47,.06);border-radius:5px;padding:2px}
+.seg-b{flex:1 1 0;min-width:0;border:0;background:none;font-family:inherit;font-size:13px;color:var(--ink-65);
+  padding:7px 8px;border-radius:4px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.seg-b:hover{color:var(--ink)}
+.seg-b[aria-checked="true"]{background:var(--paper);color:var(--ink);font-weight:500;
+  box-shadow:rgba(15,15,15,.09) 0 0 0 1px, rgba(15,15,15,.06) 0 1px 2px}
 .ctrl label{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:13px;color:var(--ink-65);margin-bottom:2px}
 .ctrl label b{font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
 .ctrl-foot{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 12px;margin-top:16px;padding-top:12px;border-top:1px solid var(--line)}
@@ -284,7 +291,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     </div>
     <div class="prop">
       <dt><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 14s4.5-4.2 4.5-7.5a4.5 4.5 0 1 0-9 0C3.5 9.8 8 14 8 14z"/><circle cx="8" cy="6.4" r="1.7"/></svg>Saída de</dt>
-      <dd>Divinópolis, MG</dd>
+      <dd id="origem-prop">Divinópolis, MG</dd>
     </div>
     <div class="prop">
       <dt><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="5.5"/><circle cx="8" cy="8" r="1.7"/></svg>Meta</dt>
@@ -325,6 +332,13 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
   <div class="controls" id="controls">
     <div class="controls-in">
       <div class="ctrl-grid">
+        <div class="ctrl ctrl-seg">
+          <label id="lbl-origem">Saída de</label>
+          <div class="seg" role="radiogroup" aria-labelledby="lbl-origem">
+            <button class="seg-b" type="button" role="radio" data-origem="div" aria-checked="true">Divinópolis</button>
+            <button class="seg-b" type="button" role="radio" data-origem="bh" aria-checked="false">Belo Horizonte</button>
+          </div>
+        </div>
         <div class="ctrl"><label for="ppl">Pessoas <b><span id="pplv">7</span></b></label><input type="range" id="ppl" min="5" max="12" step="1" value="7"></div>
         <div class="ctrl"><label for="goal">Meta por pessoa <b>R$ <span id="goalv">1.000</span></b></label><input type="range" id="goal" min="600" max="2000" step="50" value="1000"></div>
         <div class="ctrl"><label for="food">Comida e bebida por pessoa/dia <b>R$ <span id="foodv">80</span></b></label><input type="range" id="food" min="30" max="200" step="10" value="80"></div>
@@ -357,7 +371,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
   </section>
 
   <section>
-    <div class="shead"><h2>Outros destinos</h2><span>pesquisa nova</span></div>
+    <div class="shead"><h2>Outros destinos</h2><span>distâncias de Divinópolis</span></div>
     <p class="sintro">Cada 100 km a mais de Divinópolis custa cerca de R$ 30 por pessoa em combustível na ida e volta, e ainda tira meio dia de aproveitamento. Estas alternativas rendem mais por real gasto.</p>
     <div id="alts"></div>
   </section>
@@ -607,13 +621,23 @@ const GRUPOS={
  sjdr1:"São João del Rei", sjdr2:"São João del Rei", rm:"Rio Manso"
 };
 
-const DEFAULTS = {ppl:7, food:80, tour:0, fuel:6.33, kml:12, goal:1000};
+const ORIGENS = {
+  div:{nome:"Divinópolis", prop:"Divinópolis, MG", maps:"Divin%C3%B3polis,+MG", campo:"dist",  exata:true},
+  bh: {nome:"Belo Horizonte", prop:"Belo Horizonte, MG", maps:"Belo+Horizonte,+MG", campo:"distBH", exata:false}
+};
+const ORIGEM = () => ORIGENS[S.origem];
+const kmDe = c => c[ORIGEM().campo];
+// o "~" do dado original vale para as distâncias de Divinópolis; as de BH não foram conferidas
+const aprox = c => (ORIGEM().exata && c.exata) ? "" : "~";
+const mapsDe = c => c.maps.replace("Divin%C3%B3polis,+MG", ORIGEM().maps);
+
+const DEFAULTS = {ppl:7, food:80, tour:0, fuel:6.33, kml:12, goal:1000, origem:"div"};
 let S = {...DEFAULTS, sort:"pp", f:{pool:false,bbq:false,rated:false,fit:false}, fechados:new Set(Object.values(GRUPOS))};
 const brl = n => n.toLocaleString("pt-BR",{maximumFractionDigits:0});
 
 function calc(c){
   const cars = Math.ceil(S.ppl/5);
-  const km = c.dist*2;
+  const km = kmDe(c)*2;
   const fuel = (km/S.kml)*S.fuel*cars + 45*cars;
   const hosp = c.total/S.ppl;
   const fuelPP = fuel/S.ppl;
@@ -624,8 +648,8 @@ function calc(c){
 
 // distância do grupo: valor único ou faixa, com ~ se alguma casa for estimativa
 function kmGrupo(cs){
-  const ds=cs.map(c=>c.dist), mn=Math.min(...ds), mx=Math.max(...ds);
-  const ap=cs.some(c=>!c.exata)?"~":"";
+  const ds=cs.map(kmDe), mn=Math.min(...ds), mx=Math.max(...ds);
+  const ap=cs.some(c=>aprox(c))?"~":"";
   return mn===mx ? `${ap}${mn} km` : `${ap}${mn}–${mx} km`;
 }
 
@@ -669,7 +693,7 @@ function card(c){
       <span class="card-rate">${rate}</span>
     </div>
     <div class="card-line">${I.pin}${c.regiao}</div>
-    <div class="card-line">${I.rota}<span class="num">${c.exata?"":"~"}${c.dist} km de Divinópolis</span></div>
+    <div class="card-line">${I.rota}<span class="num">${aprox(c)}${kmDe(c)} km de ${ORIGEM().nome}</span></div>
     <div class="price">
       <span class="price-n">R$ ${brl(k.tot)}</span>
       <span class="price-l">por pessoa</span>
@@ -688,7 +712,7 @@ function card(c){
     ${c.warn.length?`<div class="warn">${I.warn}<div>${c.warn.map(x=>`<p>${x}</p>`).join("")}</div></div>`:""}
     <div class="card-links">
       <a class="cta cta-airbnb" href="${c.link}" target="_blank" rel="noopener">${I.airbnb}Ver no Airbnb</a>
-      <a class="cta cta-maps" href="${c.maps}" target="_blank" rel="noopener">${I.maps}Rota</a>
+      <a class="cta cta-maps" href="${mapsDe(c)}" target="_blank" rel="noopener">${I.maps}Rota</a>
     </div>
   </article>`;
 }
@@ -702,7 +726,7 @@ function render(){
     return true;
   });
   if(S.sort==="pp") list.sort((a,b)=>calc(a).tot-calc(b).tot);
-  if(S.sort==="dist") list.sort((a,b)=>a.dist-b.dist);
+  if(S.sort==="dist") list.sort((a,b)=>kmDe(a)-kmDe(b));
   if(S.sort==="rate") list.sort((a,b)=>(b.rate||0)-(a.rate||0)||(b.rateN||0)-(a.rateN||0));
   // agrupa depois de ordenar: o Map preserva a ordem, então os grupos
   // saem na ordem da casa mais bem colocada de cada um
@@ -712,6 +736,7 @@ function render(){
     if(!grupos.has(g)) grupos.set(g,[]);
     grupos.get(g).push(c);
   });
+  document.getElementById("origem-prop").textContent = ORIGEM().prop;
   document.getElementById("grid").innerHTML = list.length
     ? [...grupos].map(([g,cs],i)=>{
         const aberto=!S.fechados.has(g), id="g"+i;
@@ -769,8 +794,17 @@ Object.keys(FMT).forEach(id=>{
   el.addEventListener("input",()=>{ SET[id](+el.value); out.textContent=FMT[id](+el.value); render(); });
 });
 
+document.querySelectorAll(".seg-b").forEach(b=>{
+  b.addEventListener("click",()=>{
+    S.origem=b.dataset.origem;
+    document.querySelectorAll(".seg-b").forEach(o=>o.setAttribute("aria-checked", String(o===b)));
+    render();
+  });
+});
+
 document.getElementById("reset").addEventListener("click",()=>{
   S = {...S, ...DEFAULTS};
+  document.querySelectorAll(".seg-b").forEach(o=>o.setAttribute("aria-checked", String(o.dataset.origem===DEFAULTS.origem)));
   Object.keys(FMT).forEach(id=>{
     const el=document.getElementById(id);
     el.value = id==="fuel" ? Math.round(DEFAULTS.fuel*100) : DEFAULTS[id];

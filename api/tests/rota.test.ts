@@ -73,6 +73,14 @@ describe('GET /api/votos', () => {
     expect((await get('', PAGES)).headers.get('Access-Control-Allow-Origin')).toBe(PAGES)
     expect((await get('', 'https://evil.example')).headers.get('Access-Control-Allow-Origin')).toBeNull()
   })
+
+  it('banco indisponível devolve 503 com CORS em vez do 500 padrão do Next', async () => {
+    await encerrar()
+    encerrar = async () => {} // já fechado; evita fechar de novo no afterEach
+    const r = await get(`?dispositivo=${A}`)
+    expect(r.status).toBe(503)
+    expect(r.headers.get('Access-Control-Allow-Origin')).toBe(PAGES)
+  })
 })
 
 describe('POST /api/votos', () => {

@@ -21,7 +21,12 @@ export async function GET(req: Request) {
     return erro('dispositivo precisa ser um uuid', cors)
   }
 
-  const casas = await listarPlacar(db, dispositivo ?? undefined)
+  let casas
+  try {
+    casas = await listarPlacar(db, dispositivo ?? undefined)
+  } catch {
+    return erro('indisponível', cors, 503)
+  }
   // no-store: o placar muda a cada voto e a página busca de novo ao voltar ao foco.
   return Response.json({ casas }, { headers: { ...cors, 'Cache-Control': 'no-store' } })
 }
@@ -40,7 +45,12 @@ export async function POST(req: Request) {
   if (!parsed.success) return erro('dispositivo, casa ou valor inválido', cors)
 
   const { dispositivo, casa, valor } = parsed.data
-  const placar = await registrarVoto(db, { dispositivoId: dispositivo, casaId: casa, valor })
+  let placar
+  try {
+    placar = await registrarVoto(db, { dispositivoId: dispositivo, casaId: casa, valor })
+  } catch {
+    return erro('indisponível', cors, 503)
+  }
 
   return Response.json({ casa, ...placar }, { headers: { ...cors, 'Cache-Control': 'no-store' } })
 }

@@ -1,6 +1,7 @@
 import { and, eq, sql } from 'drizzle-orm'
 import { voto } from './schema'
 import type { Db } from './index'
+import type { CasaId } from '@/lib/casas'
 
 export type Placar = { sim: number; nao: number; saldo: number; meu: number }
 
@@ -37,7 +38,7 @@ export async function listarPlacar(
 
 export async function placarDaCasa(
   db: Db,
-  casaId: string,
+  casaId: CasaId,
   dispositivoId?: string,
 ): Promise<Placar> {
   const [linha] = await db.select(agregados).from(voto)
@@ -58,7 +59,7 @@ export async function placarDaCasa(
  */
 export async function registrarVoto(
   db: Db,
-  p: { dispositivoId: string; casaId: string; valor: 1 | 0 | -1 },
+  p: { dispositivoId: string; casaId: CasaId; valor: 1 | 0 | -1 },
 ): Promise<Placar> {
   if (p.valor === 0) {
     await db.delete(voto)

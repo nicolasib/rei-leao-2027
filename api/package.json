@@ -8,7 +8,8 @@
     "start": "next start",
     "test": "vitest run",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate"
+    "db:migrate": "drizzle-kit migrate",
+    "dev:pg": "node --experimental-strip-types scripts/dev-pg-socket.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",

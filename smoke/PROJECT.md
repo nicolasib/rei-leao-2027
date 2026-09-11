@@ -14,19 +14,22 @@
 1. Um Postgres acessível via TCP.
    - Preferencial (igual produção): `docker run -d --name rl-pg -e POSTGRES_PASSWORD=postgres -p 55433:5432 postgres:16`.
    - Alternativa equivalente, usada quando Docker não está disponível/aprovável
-     numa sessão sem interação (ex.: agente headless): subir
-     `@electric-sql/pglite-socket` — PGlite (Postgres real compilado para
-     WASM) exposto via protocolo de fiação do Postgres na mesma porta, com as
-     migrations reais do `drizzle` aplicadas. Do ponto de vista do `next dev`
-     e do `pg`/`node-postgres`, é indistinguível de um Postgres de verdade
-     (mesmo protocolo, mesmo schema, mesmas constraints). Não é um mock da
-     camada de queries.
-2. `cd api && echo 'DATABASE_URL=postgres://postgres:postgres@127.0.0.1:55433/postgres' > .env.local && pnpm db:migrate`
-   (pular `db:migrate` se usando o stand-in acima, que já aplica as migrations
-   ao subir).
-3. `pnpm --dir api dev` → API em `http://localhost:3000`.
-4. Da raiz do repo: `python3 -m http.server 8080` → página em `http://localhost:8080`.
-5. No browser, em `http://localhost:8080`: rodar
+     numa sessão sem interação (ex.: agente headless): `pnpm --dir api dev:pg`
+     — sobe PGlite (Postgres real compilado para WASM) exposto via protocolo
+     de fiação do Postgres na mesma porta, com as migrations reais do
+     `drizzle` já aplicadas. Do ponto de vista do `next dev` e do
+     `pg`/`node-postgres`, é indistinguível de um Postgres de verdade (mesmo
+     protocolo, mesmo schema, mesmas constraints). Não é um mock da camada de
+     queries.
+2. `cd api && echo 'DATABASE_URL=postgres://postgres:postgres@127.0.0.1:55433/postgres' > .env.local`
+   — esse arquivo alimenta o `next dev` (passo 4), não o `drizzle-kit`: o
+   `drizzle-kit` só lê `.env`, nunca `.env.local` (ver `api/drizzle.config.ts`).
+3. `cd api && DATABASE_URL='postgres://postgres:postgres@127.0.0.1:55433/postgres' pnpm db:migrate`
+   (forma inline, pelo motivo do passo 2; pular este passo se usando o
+   stand-in do item 1, que já aplica as migrations ao subir).
+4. `pnpm --dir api dev` → API em `http://localhost:3000`.
+5. Da raiz do repo: `python3 -m http.server 8080` → página em `http://localhost:8080`.
+6. No browser, em `http://localhost:8080`: rodar
    `localStorage.setItem('rl_api', 'http://localhost:3000')` e recarregar —
    sem isso a página aponta para a API de produção na Vercel.
 
@@ -62,6 +65,6 @@ rodar o gate; nunca remover essa chave durante um run.
   linhas; ler em janelas pequenas e fora dessas linhas.
 - Docker não esteve disponível/aprovável nesta sessão headless (comandos
   `docker ...` pedem aprovação interativa que uma sessão em background não
-  consegue conceder). O stand-in `@electric-sql/pglite-socket` documentado
-  acima é a alternativa usada; não é permanente e não faz parte do código do
-  app — é só infraestrutura de dev/gate, não committada.
+  consegue conceder). O stand-in `pnpm --dir api dev:pg` documentado acima é
+  a alternativa usada — infraestrutura de dev/gate, não faz parte do runtime
+  do app em produção.

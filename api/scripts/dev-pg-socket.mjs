@@ -1,10 +1,9 @@
-// Throwaway helper for local dev / smoke-gate only. NOT part of Task 6's
-// scope and NOT committed — Docker wasn't available/approvable in this
-// session, so this stands in for `docker run postgres` + migrate:
-// a real Postgres (PGlite, WASM) with the drizzle migrations applied,
-// exposed over the Postgres wire protocol on 127.0.0.1:55433 so that
-// `next dev` (via DATABASE_URL) talks to it exactly like it would to a
-// real Postgres container.
+// Throwaway helper for local dev / smoke-gate only. Docker wasn't
+// available/approvable in the session that wrote it, so this stands in for
+// `docker run postgres` + migrate: a real Postgres (PGlite, WASM) with the
+// drizzle migrations applied, exposed over the Postgres wire protocol on
+// 127.0.0.1:55433 so that `next dev` (via DATABASE_URL) talks to it exactly
+// like it would to a real Postgres container. Run via `pnpm --dir api dev:pg`.
 import { PGlite } from '@electric-sql/pglite'
 import { drizzle } from 'drizzle-orm/pglite'
 import { migrate } from 'drizzle-orm/pglite/migrator'

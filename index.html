@@ -846,7 +846,16 @@ async function carregarVotos(){
     if(!r.ok) throw new Error(r.status);
     const d = await r.json();
     S.votos = d.casas || {};
+    // render() reescreve #grid inteiro e derruba o foco (mesmo problema que o
+    // `volta.focus()` do handler de `.grupo` resolve para o toggle de grupo);
+    // guarda o botão de voto focado e devolve o foco depois do repaint.
+    const casaFoco = document.activeElement.closest("[data-voto-casa]")?.dataset.votoCasa;
+    const votoFoco = document.activeElement.dataset.voto;
     render();
+    if(casaFoco){
+      const alvo = document.querySelector(`[data-voto-casa="${casaFoco}"] [data-voto="${votoFoco}"]`);
+      if(alvo) alvo.focus();
+    }
   }catch(e){
     // Mantém o que já tinha. Se nunca carregou, S.votos segue null e os cards
     // mostram "votos indisponíveis" — a página continua inteira sem isso.

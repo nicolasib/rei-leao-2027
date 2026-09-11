@@ -1,0 +1,8 @@
+{
+  "addEdges": [
+    { "from": 1, "to": 2, "reason": "T2 roda vitest/drizzle-kit dentro de api/ — package.json, tsconfig e vitest.config nascem na T1" },
+    { "from": 2, "to": 3, "reason": "queries.ts importa a tabela `voto` de lib/db/schema e o type Db de lib/db, ambos criados na T2" },
+    { "from": 3, "to": 5, "reason": "o route handler chama listarPlacar e registrarVoto de lib/db/queries" },
+    { "from": 4, "to": 5, "reason": "o route handler chama postSchema/ehUuid de lib/validacao e cabecalhosCors de lib/cors" }
+  ]
+}

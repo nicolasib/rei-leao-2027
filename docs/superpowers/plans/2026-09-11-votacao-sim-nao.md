@@ -1306,9 +1306,12 @@ git commit -m "feat: ordenação por mais votadas e recarga do placar ao voltar 
 
 ---
 
-### Task 8: Deploy na Vercel e URL de produção — TAREFA MANUAL
+## Depois do run — deploy na Vercel (manual, humano)
 
-Esta task tem passos no dashboard da Vercel. Um agente não consegue executá-la sozinha: pare aqui e devolva pro humano.
+Fora da numeração de propósito: estes passos acontecem no dashboard da Vercel e
+dependem de uma URL que só existe depois do deploy. Nenhum agente executa esta
+seção — ela é o checklist do humano depois que as Tasks 1–7 estiverem
+integradas.
 
 **Files:**
 - Modify: `index.html` (a constante `API`), `README.md`

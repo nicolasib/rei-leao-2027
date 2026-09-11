@@ -68,3 +68,24 @@ rodar o gate; nunca remover essa chave durante um run.
   consegue conceder). O stand-in `pnpm --dir api dev:pg` documentado acima é
   a alternativa usada — infraestrutura de dev/gate, não faz parte do runtime
   do app em produção.
+
+## Adjudicado: A4 da Task 7 não fecha neste harness
+
+A asserção "voltar pra aba atualiza o placar" (`smoke/task-7.js`, A4) reprova
+sempre no Aside, e **não é defeito de código**. Medido de forma independente
+com uma sonda dedicada: `page.bringToFront()`, mesmo com uma segunda aba real
+aberta, não emite **nenhum** dos dois eventos que o app escuta — contadores em
+`window` ficaram em `visibilitychange=0 focus=0`, e `document.visibilityState`
+nunca sai de `"visible"`. O único comando CDP tentado para forçar a transição
+(`Emulation.setPageVisibilityOverride`) não existe no protocolo exposto.
+
+A fiação do app, por outro lado, tem evidência positiva: um `visibilitychange`
+disparado em `document` com `{bubbles: true}` — a forma que a HTML Standard
+define para o evento real — chega ao listener em `window` e o placar atualiza
+sozinho, sem reload.
+
+Veredito: `BLOCKED_ENV`, não `FAIL`. A asserção **não foi afrouxada nem
+removida** de propósito: o requisito é legítimo e continua rastreado. O que
+falta é o harness saber produzir troca de aba. Fecha com 10 segundos de
+verificação manual: abrir a página em duas janelas, votar numa, voltar na
+outra e ver o saldo mudar sem recarregar.

@@ -1,0 +1,4 @@
+.plan-state-*.json
+.plo-logs/
+node_modules/
+.DS_Store

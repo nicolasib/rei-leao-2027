@@ -1,0 +1,85 @@
+{
+  "id": "34d8149b-f386-4946-a470-78148beba1d2",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.voto": {
+      "name": "voto",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "dispositivo_id": {
+          "name": "dispositivo_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "casa_id": {
+          "name": "casa_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "valor": {
+          "name": "valor",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "criado_em": {
+          "name": "criado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "atualizado_em": {
+          "name": "atualizado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "voto_dispositivo_casa": {
+          "name": "voto_dispositivo_casa",
+          "nullsNotDistinct": false,
+          "columns": [
+            "dispositivo_id",
+            "casa_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "voto_valor": {
+          "name": "voto_valor",
+          "value": "\"voto\".\"valor\" in (1, -1)"
+        }
+      },
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

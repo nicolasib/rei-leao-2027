@@ -42,15 +42,22 @@ votante é só um UUID anônimo gerado e guardado em
 ## Dados
 
 API real contra Postgres real (ou o stand-in PGlite acima). Sem mocks e sem
-fixtures de UI — o gate escreve votos de verdade no banco local efêmero da
-sessão de dev.
+fixtures de UI — o gate escreve votos de verdade no banco local da sessão de
+dev. O stand-in (`scripts/dev-pg-socket.mjs`) sobe `new PGlite()` sem
+`dataDir`: **durável entre runs de spec** (specs seguidos na mesma sessão
+enxergam os votos uns dos outros) e **descartado só quando o processo
+`dev:pg` reinicia**. É essa durabilidade — não efemeridade — que sustenta o
+desenho por deltas dos specs (`smoke/task-6.js`, `smoke/task-7.js`): os
+asserts comparam contra o placar lido no boot, nunca contra contagem
+absoluta, porque um run anterior pode ter deixado votos na mesma casa.
 
 ## Escrita permitida?
 
-Sim, mas só contra o Postgres **local e efêmero** subido para o gate — nunca
-contra a API de produção (`https://rei-leao-votos.vercel.app`). Confirmar
-sempre que `localStorage.rl_api` aponta para `http://localhost:3000` antes de
-rodar o gate; nunca remover essa chave durante um run.
+Sim, mas só contra o Postgres **local**, durável entre runs de spec e
+descartado quando o processo do gate reinicia — nunca contra a API de
+produção (`https://rei-leao-votos.vercel.app`). Confirmar sempre que
+`localStorage.rl_api` aponta para `http://localhost:3000` antes de rodar o
+gate; nunca remover essa chave durante um run.
 
 ## Notas conhecidas / armadilhas
 

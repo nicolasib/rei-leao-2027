@@ -145,8 +145,9 @@ await shot(page, 'mais-votadas');
 // A2 · CLICKABLE — voto não reordena a grade
 // ---------------------------------------------------------------------------
 const ordemAntesA2 = await ordemDom(page);
-const casaA2 = ordemAntesA2[ordemAntesA2.length - 1];
-note(`A2 alvo (última da grade): ${casaA2}; ordem antes: ${JSON.stringify(ordemAntesA2)}`);
+// última casa que não seja nl1/nl2 — fixture do task-6.js (ver cabeçalho).
+const casaA2 = [...ordemAntesA2].reverse().find((c) => c !== 'nl1' && c !== 'nl2');
+note(`A2 alvo (última da grade, exceto nl1/nl2): ${casaA2}; ordem antes: ${JSON.stringify(ordemAntesA2)}`);
 
 await abrirGrupo(page, casaA2);
 const antesA2 = await estadoVoto(page, casaA2);

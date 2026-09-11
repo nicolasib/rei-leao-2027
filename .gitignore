@@ -1,0 +1,10 @@
+.plan-state-*.json
+.plo-logs/
+node_modules/
+.DS_Store
+.superpowers/
+
+# saída descartável do smoke gate: capturas, result.json e probes de diagnóstico.
+# Os specs (smoke/task-N.js) são versionados; isto não.
+smoke/.gate-shots/
+smoke/probe*.js

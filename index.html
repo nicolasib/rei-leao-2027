@@ -117,6 +117,20 @@ input[type=range]::-moz-range-track{height:4px;border-radius:2px;background:var(
 input[type=range]::-moz-range-thumb{width:14px;height:14px;border:0;border-radius:50%;
   background:#fff;box-shadow:rgba(15,15,15,.1) 0 0 0 1px,rgba(15,15,15,.2) 0 2px 4px}
 
+/* ---------- votos ---------- */
+.voto{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:14px 0 0;padding:12px 0 0;border-top:1px solid var(--line)}
+.voto-b{display:inline-flex;align-items:center;gap:5px;background:none;border:1px solid var(--line-2);border-radius:var(--r);
+  font-family:inherit;font-size:14px;line-height:20px;color:var(--ink-65);padding:5px 12px;cursor:pointer}
+.voto-b:hover:not(:disabled){background:var(--hover)}
+.voto-b[aria-pressed="true"].voto-sim{background:var(--green-bg);color:var(--green-tx);border-color:transparent;font-weight:500}
+.voto-b[aria-pressed="true"].voto-nao{background:var(--red-bg);color:var(--red-tx);border-color:transparent;font-weight:500}
+.voto-b:disabled{opacity:.45;cursor:default}
+.voto-saldo{margin-left:auto;font-size:16px;font-weight:600;color:var(--ink-40);font-variant-numeric:tabular-nums}
+.voto-saldo.pos{color:var(--green-tx)}
+.voto-saldo.neg{color:var(--red-tx)}
+.voto-cont{flex:0 0 100%;font-size:12px;color:var(--ink-50)}
+.voto-erro{flex:0 0 100%;font-size:12px;color:var(--red-tx)}
+
 /* ---------- cards ---------- */
 .grid{display:flex;flex-direction:column;gap:18px;margin-top:20px}
 .grupo-h{margin:0 0 13px}
@@ -320,6 +334,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
       <button class="tb" data-sort="pp" aria-pressed="true">Mais barata</button>
       <button class="tb" data-sort="dist" aria-pressed="false">Mais perto</button>
       <button class="tb" data-sort="rate" aria-pressed="false">Mais bem avaliada</button>
+      <button class="tb" data-sort="votos" aria-pressed="false">Mais votadas</button>
       <span class="tb-sep" aria-hidden="true"></span>
       <span class="tb-lab">Filtrar</span>
       <button class="tb" data-filter="pool" aria-pressed="false">Piscina</button>
@@ -721,8 +736,131 @@ const aprox = c => (ORIGEM().exata && c.exata) ? "" : "~";
 const mapsDe = c => c.maps.replace("Divin%C3%B3polis,+MG", ORIGEM().maps);
 
 const DEFAULTS = {ppl:7, food:80, tour:0, fuel:6.33, kml:12, goal:1000, origem:"div"};
-let S = {...DEFAULTS, sort:"pp", f:{pool:false,bbq:false,rated:false,fit:false}, fechados:new Set(Object.values(GRUPOS))};
+let S = {...DEFAULTS, sort:"pp", f:{pool:false,bbq:false,rated:false,fit:false}, fechados:new Set(Object.values(GRUPOS)), votos:null};
 const brl = n => n.toLocaleString("pt-BR",{maximumFractionDigits:0});
+
+/* ---------- votos ---------- */
+// A página é estática no GitHub Pages; o placar vem da API na Vercel.
+// rl_api existe para o dev local e o smoke gate apontarem pro next dev.
+const API = localStorage.getItem("rl_api") || "https://rei-leao-votos.vercel.app";
+
+// Identidade anônima por dispositivo. Cookie não serve: viria do domínio da
+// Vercel, seria cookie de terceiro e o Safari bloqueia por padrão.
+function dispositivoId(){
+  let v = localStorage.getItem("rl_dispositivo");
+  if(!v){ v = crypto.randomUUID(); localStorage.setItem("rl_dispositivo", v); }
+  return v;
+}
+
+const VAZIO = {sim:0, nao:0, saldo:0, meu:0};
+// S.votos === null significa "não temos placar" (carregando ou API fora).
+const placar = id => (S.votos && S.votos[id]) || VAZIO;
+
+// Recalcula o placar local a partir do voto anterior desta pessoa, para a UI
+// otimista não precisar esperar a rede.
+function aplicarVoto(p, meu){
+  const sim = p.sim - (p.meu === 1 ? 1 : 0) + (meu === 1 ? 1 : 0);
+  const nao = p.nao - (p.meu === -1 ? 1 : 0) + (meu === -1 ? 1 : 0);
+  return {sim, nao, saldo: sim - nao, meu};
+}
+
+function blocoVoto(c){
+  if(!S.votos) return `<div class="voto" data-voto-casa="${c.id}">
+    <button class="voto-b voto-sim" disabled>Sim</button>
+    <button class="voto-b voto-nao" disabled>Não</button>
+    <span class="voto-cont">votos indisponíveis</span>
+  </div>`;
+  const p = placar(c.id);
+  const cls = p.saldo > 0 ? "pos" : p.saldo < 0 ? "neg" : "";
+  const total = p.sim + p.nao;
+  return `<div class="voto" data-voto-casa="${c.id}">
+    <button class="voto-b voto-sim" data-voto="1" data-casa="${c.id}" aria-pressed="${p.meu===1}">Sim</button>
+    <button class="voto-b voto-nao" data-voto="-1" data-casa="${c.id}" aria-pressed="${p.meu===-1}">Não</button>
+    <span class="voto-saldo ${cls}">${p.saldo > 0 ? "+" : ""}${p.saldo}</span>
+    <span class="voto-cont">${total ? `${p.sim} sim · ${p.nao} não` : "ninguém votou ainda"}</span>
+  </div>`;
+}
+
+// Repinta só este bloco: re-renderizar a grade inteira no clique tiraria o card
+// de baixo do dedo de quem votou. `foco` é o valor (1/-1) do botão em que a
+// pessoa clicou: o outerHTML troca o nó inteiro, então quem votou pelo
+// teclado perderia o foco a cada repaint sem isso — mesmo padrão do
+// `volta.focus()` do handler de `.grupo`, alguns parágrafos acima.
+function pintarVoto(id, erro, foco){
+  const el = document.querySelector(`[data-voto-casa="${id}"]`);
+  if(!el) return;
+  el.outerHTML = blocoVoto(casas.find(c => c.id === id));
+  if(erro){
+    const novo = document.querySelector(`[data-voto-casa="${id}"]`);
+    if(novo) novo.insertAdjacentHTML("beforeend", `<span class="voto-erro">não deu pra salvar — tente de novo</span>`);
+  }
+  if(foco !== undefined){
+    const alvo = document.querySelector(`[data-voto-casa="${id}"] [data-voto="${foco}"]`);
+    if(alvo) alvo.focus();
+  }
+}
+
+// Ids de casa com um POST em voo: evita que um segundo clique na mesma casa
+// (antes da resposta do primeiro chegar) dispare uma corrida onde a resposta
+// que chega por último — não a do clique mais recente — vence.
+const votosEmVoo = new Set();
+
+async function votar(casaId, clicado){
+  if(!S.votos) return;
+  if(votosEmVoo.has(casaId)) return;
+  votosEmVoo.add(casaId);
+  try{
+    const antes = {...placar(casaId)};
+    // Clicar no voto que já está marcado volta pro neutro.
+    const meu = antes.meu === clicado ? 0 : clicado;
+
+    S.votos[casaId] = aplicarVoto(antes, meu);
+    pintarVoto(casaId, false, clicado);
+
+    try{
+      const r = await fetch(API + "/api/votos", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({dispositivo: dispositivoId(), casa: casaId, valor: meu})
+      });
+      if(!r.ok) throw new Error(r.status);
+      const d = await r.json();
+      S.votos[casaId] = {sim:d.sim, nao:d.nao, saldo:d.saldo, meu:d.meu};
+      pintarVoto(casaId, false, clicado);
+    }catch(e){
+      S.votos[casaId] = antes;
+      pintarVoto(casaId, true, clicado);
+    }
+  }finally{
+    votosEmVoo.delete(casaId);
+  }
+}
+
+let ultimoFetch = 0;
+async function carregarVotos(){
+  const agora = Date.now();
+  if(agora - ultimoFetch < 5000) return;   // o foco dispara fácil; um a cada 5s basta
+  ultimoFetch = agora;
+  try{
+    const r = await fetch(`${API}/api/votos?dispositivo=${dispositivoId()}`, {cache:"no-store"});
+    if(!r.ok) throw new Error(r.status);
+    const d = await r.json();
+    S.votos = d.casas || {};
+    // render() reescreve #grid inteiro e derruba o foco (mesmo problema que o
+    // `volta.focus()` do handler de `.grupo` resolve para o toggle de grupo);
+    // guarda o botão de voto focado e devolve o foco depois do repaint.
+    const casaFoco = document.activeElement.closest("[data-voto-casa]")?.dataset.votoCasa;
+    const votoFoco = document.activeElement.dataset.voto;
+    render();
+    if(casaFoco){
+      const alvo = document.querySelector(`[data-voto-casa="${casaFoco}"] [data-voto="${votoFoco}"]`);
+      if(alvo) alvo.focus();
+    }
+  }catch(e){
+    // Mantém o que já tinha. Se nunca carregou, S.votos segue null e os cards
+    // mostram "votos indisponíveis" — a página continua inteira sem isso.
+  }
+}
 
 function calc(c){
   const cars = Math.ceil(S.ppl/5);
@@ -799,6 +937,7 @@ function card(c){
     <p class="specs">${c.specs}</p>
     <div class="tags">${tags.join("")}</div>
     ${c.warn.length?`<div class="warn">${I.warn}<div>${c.warn.map(x=>`<p>${x}</p>`).join("")}</div></div>`:""}
+    ${blocoVoto(c)}
     <div class="card-links">
       <a class="cta cta-airbnb" href="${c.link}" target="_blank" rel="noopener">${I.airbnb}Ver no Airbnb</a>
       <a class="cta cta-maps" href="${mapsDe(c)}" target="_blank" rel="noopener">${I.maps}Rota</a>
@@ -817,6 +956,9 @@ function render(){
   if(S.sort==="pp") list.sort((a,b)=>calc(a).tot-calc(b).tot);
   if(S.sort==="dist") list.sort((a,b)=>kmDe(a)-kmDe(b));
   if(S.sort==="rate") list.sort((a,b)=>(b.rate||0)-(a.rate||0)||(b.rateN||0)-(a.rateN||0));
+  // Saldo desc; empate vai pro mais barato por pessoa, que é o critério padrão
+  // da página. Casas sem voto valem 0 e caem entre as aprovadas e as reprovadas.
+  if(S.sort==="votos") list.sort((a,b)=> placar(b.id).saldo - placar(a.id).saldo || calc(a).tot - calc(b).tot);
   // agrupa depois de ordenar: o Map preserva a ordem, então os grupos
   // saem na ordem da casa mais bem colocada de cada um
   const grupos=new Map();
@@ -964,6 +1106,8 @@ grid.addEventListener("click",e=>{
     if(volta) volta.focus();
     return;
   }
+  const v=e.target.closest("[data-voto]");
+  if(v){ votar(v.dataset.casa, +v.dataset.voto); return; }
   const t=e.target.closest("[data-gal]"); if(!t) return;
   const hit=e.target.closest("[data-i]");
   lbOpen(t.dataset.gal, hit?+hit.dataset.i:0);
@@ -991,6 +1135,10 @@ const ofChk=()=>tbs.classList.toggle("of", tbs.scrollWidth - tbs.scrollLeft - tb
 tbs.addEventListener("scroll",ofChk); addEventListener("resize",ofChk); ofChk();
 
 render();
+carregarVotos();
+// Sem polling: só quando a pessoa volta pra aba é que vale gastar uma requisição.
+addEventListener("visibilitychange", ()=>{ if(document.visibilityState === "visible") carregarVotos(); });
+addEventListener("focus", carregarVotos);
 </script>
 </body>
 </html>

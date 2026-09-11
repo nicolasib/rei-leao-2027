@@ -959,17 +959,24 @@ function render(){
   // Saldo desc; empate vai pro mais barato por pessoa, que é o critério padrão
   // da página. Casas sem voto valem 0 e caem entre as aprovadas e as reprovadas.
   if(S.sort==="votos") list.sort((a,b)=> placar(b.id).saldo - placar(a.id).saldo || calc(a).tot - calc(b).tot);
+  // Em "Mais votadas" a lista sai plana. O agrupamento por região nasce
+  // colapsado, então era justamente a casa vencedora que ficava escondida
+  // atrás de um cabeçalho; sem grupo, o ranking se lê de cima pra baixo.
+  const plano = S.sort==="votos";
   // agrupa depois de ordenar: o Map preserva a ordem, então os grupos
   // saem na ordem da casa mais bem colocada de cada um
   const grupos=new Map();
-  list.forEach(c=>{
+  if(!plano) list.forEach(c=>{
     const g=GRUPOS[c.id]||c.regiao;
     if(!grupos.has(g)) grupos.set(g,[]);
     grupos.get(g).push(c);
   });
   document.getElementById("origem-prop").textContent = ORIGEM().prop;
-  document.getElementById("grid").innerHTML = list.length
-    ? [...grupos].map(([g,cs],i)=>{
+  document.getElementById("grid").innerHTML = !list.length
+    ? `<p class="empty">Nenhuma casa passa por esses filtros. Solte um filtro ou aumente a meta em Ajustar.</p>`
+    : plano
+    ? `<div class="grupo-cards">${list.map(card).join("")}</div>`
+    : [...grupos].map(([g,cs],i)=>{
         const aberto=!S.fechados.has(g), id="g"+i;
         return `<div class="grupo-sec">
           <h3 class="grupo-h"><button class="grupo" data-grupo="${g}" aria-expanded="${aberto}" aria-controls="${id}">
@@ -977,8 +984,7 @@ function render(){
           </button></h3>
           <div class="grupo-cards" id="${id}"${aberto?"":" hidden"}>${cs.map(card).join("")}</div>
         </div>`;
-      }).join("")
-    : `<p class="empty">Nenhuma casa passa por esses filtros. Solte um filtro ou aumente a meta em Ajustar.</p>`;
+      }).join("");
 }
 
 document.getElementById("checks").innerHTML = checks.map(c=>`

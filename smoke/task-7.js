@@ -260,7 +260,7 @@ await shot(page, 'apos-voltar-de-aba');
 // evento sintético dispatchado no document, já que o app escuta em window e
 // o browser dispara visibilitychange no document.
 try {
-  await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange')));
+  await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange', { bubbles: true })));
   await sleep(1500);
   const depoisSintetico = await estadoVoto(page, CASA_A4);
   note(`A4 (advisory, não conta) — após dispatch sintético de visibilitychange no document: ${depoisSintetico}`);

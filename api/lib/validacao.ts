@@ -8,6 +8,4 @@ export const postSchema = z.object({
   valor: z.union([z.literal(1), z.literal(0), z.literal(-1)]),
 })
 
-export type PostVoto = z.infer<typeof postSchema>
-
 export const ehUuid = (v: string): boolean => z.uuid().safeParse(v).success

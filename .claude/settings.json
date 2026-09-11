@@ -41,7 +41,12 @@
       "Bash(chmod:*)",
       "Bash(test:*)",
       "Bash(basename:*)",
-      "Bash(dirname:*)"
+      "Bash(dirname:*)",
+      "Bash(aside:*)",
+      "Bash(/Users/nicolasibraim/.local/bin/aside:*)",
+      "Bash(/Users/nicolasibraim/.claude/skills/smoke-gate/runner/smoke-run.sh:*)",
+      "Bash(lsof:*)",
+      "Bash(nohup:*)"
     ],
     "deny": [
       "Bash(git push:*)",

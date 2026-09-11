@@ -4,3 +4,9 @@ node_modules
 .env.local
 *.tsbuildinfo
 next-env.d.ts
+.vercel
+.env*
+
+# skills que a integração do Neon baixa sozinha a cada `vercel integration add`
+.agents
+skills-lock.json

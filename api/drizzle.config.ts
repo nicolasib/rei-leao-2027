@@ -1,7 +1,4 @@
 import type { Config } from 'drizzle-kit'
-import { config } from 'dotenv'
-
-config({ path: '.env.local' })
 
 function resolverUrl(): string {
   const url = process.env.DATABASE_URL ?? process.env.POSTGRES_URL

@@ -62,13 +62,13 @@ describe('placar', () => {
     const { db, encerrar } = await criarDbDeTeste()
     await registrarVoto(db, { dispositivoId: A, casaId: 'st2', valor: 1 })
     await registrarVoto(db, { dispositivoId: B, casaId: 'st2', valor: 1 })
-    await registrarVoto(db, { dispositivoId: B, casaId: 'cipo1', valor: -1 })
+    await registrarVoto(db, { dispositivoId: B, casaId: 'cipo2', valor: -1 })
 
     const placar = await listarPlacar(db, A)
 
-    expect(Object.keys(placar).sort()).toEqual(['cipo1', 'st2'])
+    expect(Object.keys(placar).sort()).toEqual(['cipo2', 'st2'])
     expect(placar.st2).toEqual({ sim: 2, nao: 0, saldo: 2, meu: 1 })
-    expect(placar.cipo1).toEqual({ sim: 0, nao: 1, saldo: -1, meu: 0 })
+    expect(placar.cipo2).toEqual({ sim: 0, nao: 1, saldo: -1, meu: 0 })
     await encerrar()
   })
 

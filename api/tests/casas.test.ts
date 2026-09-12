@@ -10,7 +10,7 @@ describe('lista fechada de casas', () => {
     const html = readFileSync(resolve(__dirname, '../../index.html'), 'utf8')
     const noHtml = [...html.matchAll(/\{id:"([^"]+)"/g)].map(m => m[1])
 
-    expect(noHtml).toHaveLength(23)
+    expect(noHtml).toHaveLength(27)
     expect([...CASAS_IDS].sort()).toEqual([...noHtml].sort())
   })
 })

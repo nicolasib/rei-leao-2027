@@ -44,7 +44,7 @@ describe('tabela voto', () => {
     const { db, encerrar } = await criarDbDeTeste()
     await db.insert(voto).values([
       { dispositivoId: DISPOSITIVO, casaId: 'st2', valor: 1 },
-      { dispositivoId: DISPOSITIVO, casaId: 'cipo1', valor: -1 },
+      { dispositivoId: DISPOSITIVO, casaId: 'cipo2', valor: -1 },
     ])
 
     const linhas = await db.select().from(voto).where(eq(voto.dispositivoId, DISPOSITIVO))

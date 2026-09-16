@@ -4,10 +4,9 @@
  * tests/casas.test.ts falha se as duas divergirem.
  */
 export const CASAS_IDS = [
-  'st2', 'st3', 'nl1', 'nl2', 'sjdr1', 'cipo2', 'cipo3', 'vertente', 'felix',
-  'cipoc', 'itag', 'cillis', 'renascer', 'pl', 'jeq', 'felix2', 'claudio',
-  'arcos', 'moeda', 'bougain', 'tm', 'iga', 'pim1', 'manh', 'pim2', 'guape',
-  'tamboril',
+  'st2', 'nl1', 'nl2', 'sjdr1', 'cipo3', 'felix', 'cipoc', 'itag',
+  'cillis', 'renascer', 'jeq', 'felix2', 'claudio', 'arcos', 'bougain',
+  'tm', 'pim1', 'manh', 'pim2', 'guape',
 ] as const
 
 export type CasaId = (typeof CASAS_IDS)[number]

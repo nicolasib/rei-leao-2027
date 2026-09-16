@@ -86,6 +86,9 @@ h1{font-size:36px;line-height:1.2;letter-spacing:-.022em;font-weight:700}
   font-size:14px;line-height:20px;color:var(--ink-65);padding:5px 7px;border-radius:var(--r);cursor:pointer;white-space:nowrap}
 .tb:hover{background:var(--hover)}
 .tb[aria-pressed="true"]{background:var(--blue-bg);color:var(--blue-tx);font-weight:500}
+.tb-sel{gap:4px;padding-right:3px}
+.tb-sel select{font-family:inherit;font-size:14px;line-height:20px;color:inherit;background:none;border:0;border-radius:var(--r-sm);padding:1px 2px;cursor:pointer}
+.tb-sel select:focus-visible{outline:2px solid var(--blue-tx);outline-offset:1px}
 .tb-adjust{flex:0 0 auto;align-self:flex-start;margin:8px 0 0 6px;padding-left:10px;border-left:1px solid var(--line-2);border-radius:0}
 .tb-adjust span{display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border-radius:var(--r)}
 .tb-adjust:hover{background:none}
@@ -341,6 +344,8 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
       <button class="tb" data-filter="bbq" aria-pressed="false">Churrasqueira</button>
       <button class="tb" data-filter="rated" aria-pressed="false">Com avaliações</button>
       <button class="tb" data-filter="fit" aria-pressed="false">Cabe na meta</button>
+      <label class="tb tb-sel" aria-pressed="false">Quartos<select id="f-quartos" data-min="minQ" aria-label="Mínimo de quartos"></select></label>
+      <label class="tb tb-sel" aria-pressed="false">Banheiros<select id="f-banheiros" data-min="minB" aria-label="Mínimo de banheiros"></select></label>
     </div>
     <button class="tb tb-adjust" id="adjust" aria-expanded="false" aria-controls="controls"><span><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2.5 4.5h3.4M10.1 4.5h3.4M2.5 11.5h1.4M8.1 11.5h5.4"/><circle cx="8" cy="4.5" r="1.6"/><circle cx="6" cy="11.5" r="1.6"/></svg>Ajustar</span></button>
   </div>
@@ -709,8 +714,14 @@ const aprox = c => (ORIGEM().exata && c.exata) ? "" : "~";
 const mapsDe = c => c.maps.replace("Divin%C3%B3polis,+MG", ORIGEM().maps);
 
 const DEFAULTS = {ppl:7, food:80, tour:0, fuel:6.33, kml:12, goal:1000, origem:"div"};
-let S = {...DEFAULTS, sort:"pp", f:{pool:false,bbq:false,rated:false,fit:false}, fechados:new Set(Object.values(GRUPOS)), votos:null};
+let S = {...DEFAULTS, sort:"pp", f:{pool:false,bbq:false,rated:false,fit:false,minQ:0,minB:0}, fechados:new Set(Object.values(GRUPOS)), votos:null};
 const brl = n => n.toLocaleString("pt-BR",{maximumFractionDigits:0});
+
+// Quartos e banheiros só existem dentro de `specs` ("… · 3 quartos · 5 camas ·
+// 2,5 banheiros"); meio banheiro (lavabo) vem com vírgula e conta como 0,5.
+const numSpec = (specs, rx) => { const m = specs.match(rx); return m ? parseFloat(m[1].replace(",",".")) : 0; };
+const quartos   = c => numSpec(c.specs, /([\d,]+)\s+quartos?/);
+const banheiros = c => numSpec(c.specs, /([\d,]+)\s+banheiros?/);
 
 /* ---------- votos ---------- */
 // A página é estática no GitHub Pages; o placar vem da API na Vercel.
@@ -924,6 +935,8 @@ function render(){
     if(S.f.bbq && !c.bbq) return false;
     if(S.f.rated && !c.rate) return false;
     if(S.f.fit && calc(c).tot > S.goal) return false;
+    if(S.f.minQ && quartos(c) < S.f.minQ) return false;
+    if(S.f.minB && banheiros(c) < S.f.minB) return false;
     return true;
   });
   if(S.sort==="pp") list.sort((a,b)=>calc(a).tot-calc(b).tot);
@@ -976,6 +989,23 @@ document.getElementById("alts").innerHTML = alts.map(a=>`
       <a class="cta cta-maps" href="${a.m}" target="_blank" rel="noopener">${I.maps}Rota</a>
     </div>
   </div>`).join("");
+
+// As opções saem dos próprios dados: uma casa nova com 5 quartos entra na
+// lista sozinha, e um piso que não filtraria nada não vira opção.
+function montarMinimos(sel, valores){
+  const pisos=[...new Set(valores.map(Math.floor))].sort((a,b)=>a-b).slice(1);
+  sel.innerHTML = `<option value="0">todos</option>` + pisos.map(n=>`<option value="${n}">${n}+</option>`).join("");
+}
+montarMinimos(document.getElementById("f-quartos"), casas.map(quartos));
+montarMinimos(document.getElementById("f-banheiros"), casas.map(banheiros));
+
+document.querySelectorAll("select[data-min]").forEach(sel=>{
+  sel.addEventListener("change",()=>{
+    S.f[sel.dataset.min] = +sel.value;
+    sel.closest(".tb-sel").setAttribute("aria-pressed", String(+sel.value > 0));
+    render();
+  });
+});
 
 document.querySelectorAll(".tb[data-sort],.tb[data-filter]").forEach(ch=>{
   ch.addEventListener("click",()=>{

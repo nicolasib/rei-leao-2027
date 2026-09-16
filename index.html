@@ -334,10 +334,10 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
   <div class="tb-row">
     <div class="tb-scroll" role="group" aria-label="Ordenar e filtrar">
       <span class="tb-lab">Ordenar</span>
+      <button class="tb" data-sort="votos" aria-pressed="false">Mais votadas</button>
       <button class="tb" data-sort="pp" aria-pressed="true">Mais barata</button>
       <button class="tb" data-sort="dist" aria-pressed="false">Mais perto</button>
       <button class="tb" data-sort="rate" aria-pressed="false">Mais bem avaliada</button>
-      <button class="tb" data-sort="votos" aria-pressed="false">Mais votadas</button>
       <span class="tb-sep" aria-hidden="true"></span>
       <span class="tb-lab">Filtrar</span>
       <button class="tb" data-filter="pool" aria-pressed="false">Piscina</button>
@@ -937,6 +937,10 @@ function render(){
     if(S.f.fit && calc(c).tot > S.goal) return false;
     if(S.f.minQ && quartos(c) < S.f.minQ) return false;
     if(S.f.minB && banheiros(c) < S.f.minB) return false;
+    // Em "Mais votadas" a lista é o ranking do grupo: casa que só colecionou
+    // "não" já foi descartada e ocupa espaço. Sem voto nenhum ela continua,
+    // porque ainda não foi julgada.
+    if(S.sort==="votos"){ const p=placar(c.id); if(p.nao>0 && p.sim===0) return false; }
     return true;
   });
   if(S.sort==="pp") list.sort((a,b)=>calc(a).tot-calc(b).tot);

@@ -272,20 +272,20 @@ body.lb-open{overflow:hidden}
     </div>
     <div class="prop">
       <dt><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="1.8" y="4" width="12.4" height="8.5" rx="1.3"/><path d="M1.8 7h12.4M4.3 10h2.4"/></svg>Reserva</dt>
-      <dd class="num" id="reserva-prop">R$ 6.396 · R$ 1.599 por noite</dd>
+      <dd class="num" id="reserva-prop">R$ 4.797 · R$ 1.199 por noite</dd>
     </div>
     <div class="prop">
       <dt><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="5.5"/><circle cx="8" cy="8" r="1.7"/></svg>Meta</dt>
       <dd class="num" id="meta-prop">R$ 1.000 por pessoa</dd>
     </div>
   </dl>
-  <p class="lede">Fechamos a Casa Primavera, na Serra do Cipó. Esta página faz a conta de quanto a viagem sai por pessoa — hospedagem + combustível + comida — com a mesma régua que usamos para comparar as casas.</p>
+  <p class="lede">Fechamos e pagamos a Casa Primavera, na Serra do Cipó. Esta página faz a conta de quanto a viagem sai por pessoa — hospedagem + combustível + comida — com a mesma régua que usamos para comparar as casas.</p>
 </header>
 
 <aside class="callout">
   <div class="callout-i" aria-hidden="true">💡</div>
   <div>
-    <p>Abra <span class="kbd">Ajustar</span> na barra abaixo para mudar o valor da reserva, o nº de pessoas, o gasto com comida e o preço do combustível. A conta refaz na hora.</p>
+    <p>Abra <span class="kbd">Ajustar</span> na barra abaixo para mudar o nº de pessoas, o gasto com comida e o preço do combustível. A conta refaz na hora.</p>
   </div>
 </aside>
 </div>
@@ -308,11 +308,11 @@ body.lb-open{overflow:hidden}
           </div>
         </div>
         <div class="ctrl ctrl-full">
-          <label for="total">Valor total da reserva</label>
-          <div class="ctrl-in"><span>R$</span><input type="text" id="total" inputmode="decimal" autocomplete="off" value="6.396"></div>
-          <p class="ctrl-hint">Cotado no anúncio para 7 hóspedes. Se a reserva saiu por outro valor, troque aqui.</p>
+          <label for="total">Valor pago na reserva</label>
+          <div class="ctrl-in"><span>R$</span><input type="text" id="total" inputmode="decimal" autocomplete="off" value="4.797"></div>
+          <p class="ctrl-hint">Já está pago. Mude só se quiser simular outro valor.</p>
         </div>
-        <div class="ctrl"><label for="ppl">Pessoas <b><span id="pplv">7</span></b></label><input type="range" id="ppl" min="4" max="8" step="1" value="7"></div>
+        <div class="ctrl"><label for="ppl">Pessoas <b><span id="pplv">8</span></b></label><input type="range" id="ppl" min="4" max="8" step="1" value="8"></div>
         <div class="ctrl"><label for="goal">Meta por pessoa <b>R$ <span id="goalv">1.000</span></b></label><input type="range" id="goal" min="600" max="2000" step="50" value="1000"></div>
         <div class="ctrl"><label for="food">Comida e bebida por pessoa/dia <b>R$ <span id="foodv">80</span></b></label><input type="range" id="food" min="30" max="200" step="10" value="80"></div>
         <div class="ctrl"><label for="tour">Passeios por pessoa (total) <b>R$ <span id="tourv">0</span></b></label><input type="range" id="tour" min="0" max="400" step="20" value="0"></div>
@@ -363,8 +363,8 @@ body.lb-open{overflow:hidden}
     <table>
       <thead><tr><th>Item</th><th style="text-align:right">Padrão</th></tr></thead>
       <tbody>
-        <tr><td>Hospedagem</td><td class="n">valor da reserva ÷ nº de pessoas</td></tr>
-        <tr><td>Reserva</td><td class="n">R$ 6.396 pelas 4 noites</td></tr>
+        <tr><td>Hospedagem</td><td class="n">valor pago ÷ nº de pessoas (padrão: 8)</td></tr>
+        <tr><td>Reserva</td><td class="n">R$ 4.797 pagos pelas 4 noites</td></tr>
         <tr><td>Distância (só ida)</td><td class="n">~213 km de Divinópolis · ~98 km de BH</td></tr>
         <tr><td>Gasolina</td><td class="n">R$ 6,33/L</td></tr>
         <tr><td>Consumo</td><td class="n">12 km/L</td></tr>
@@ -375,7 +375,7 @@ body.lb-open{overflow:hidden}
       </tbody>
     </table>
     <p class="note">Preço da gasolina: média da ANP para Minas Gerais em julho de 2026 (R$ 6,334/L). A distância sai de rota calculada até a coordenada aproximada do anúncio e aparece com "~". Pedágio é média aproximada dos trechos mineiros.</p>
-    <p class="note"><b>Sobre o valor da reserva:</b> R$ 6.396 é o total que o anúncio mostrava para 7 hóspedes nessas datas. Se a reserva saiu para outro número de pessoas ou com outro preço, o valor pago é o que vale — troque em Ajustar. O slider de pessoas divide o valor da reserva; ele não acrescenta taxa de hóspede extra.</p>
+    <p class="note"><b>Sobre o valor da reserva:</b> R$ 4.797 é o que o grupo pagou pelas 4 noites. É o único número fechado da página. O slider de pessoas só divide esse total: se alguém entrar ou sair, muda a parte de cada um, não o valor pago.</p>
   </section>
 
   <footer>
@@ -400,8 +400,8 @@ body.lb-open{overflow:hidden}
 
 <script>
 // A casa que o grupo fechou. Os dados vêm do anúncio, como no comparador
-// (casas.html, onde ela era a "cipo2"); total é o valor cotado para 7 hóspedes.
-const CASA = {id:"cipo2", regiao:"Santana do Riacho · Serra do Cipó", nome:"Casa Primavera", total:6396, cap:8,
+// (casas.html, onde ela era a "cipo2"); total é o valor que o grupo pagou.
+const CASA = {id:"cipo2", regiao:"Santana do Riacho · Serra do Cipó", nome:"Casa Primavera", total:4797, cap:8,
   specs:"Espaço inteiro · 8 hóspedes · 3 quartos · 5 camas · 2 banheiros",
   pool:true, bbq:true, rate:5.0, rateN:21, dist:213, distBH:98, exata:false,
   tags:["Preferido dos hóspedes","Cabe 8 pessoas"],
@@ -450,7 +450,7 @@ const kmDe = c => c[ORIGEM().campo];
 const aprox = c => (ORIGEM().exata && c.exata) ? "" : "~";
 const mapsDe = c => c.maps.replace("Divin%C3%B3polis,+MG", ORIGEM().maps);
 
-const DEFAULTS = {ppl:7, food:80, tour:0, fuel:6.33, kml:12, goal:1000, origem:"div", total:CASA.total};
+const DEFAULTS = {ppl:8, food:80, tour:0, fuel:6.33, kml:12, goal:1000, origem:"div", total:CASA.total};
 let S = {...DEFAULTS};
 const brl = n => n.toLocaleString("pt-BR",{maximumFractionDigits:0});
 const reais = n => n.toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -596,8 +596,8 @@ Object.keys(FMT).forEach(id=>{
   el.addEventListener("input",()=>{ SET[id](+el.value); out.textContent=FMT[id](+el.value); render(); });
 });
 
-// Valor em reais do jeito que se digita no Brasil: "6.396", "6396,50",
-// "R$ 6.396,00". Ponto é milhar, vírgula é centavo. Enquanto o campo não
+// Valor em reais do jeito que se digita no Brasil: "4.797", "4797,50",
+// "R$ 4.797,00". Ponto é milhar, vírgula é centavo. Enquanto o campo não
 // tem um número válido, a conta fica no último valor bom.
 const totalIn = $("total");
 const lerReais = s => parseFloat(s.replace(/[^\d,]/g,"").replace(",","."));

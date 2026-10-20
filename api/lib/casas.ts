@@ -1,5 +1,5 @@
 /**
- * Os ids das casas vivem no array `casas` do index.html — o HTML é a fonte da
+ * Os ids das casas vivem no array `casas` do casas.html — o HTML é a fonte da
  * verdade. Esta lista existe só para a API recusar casa desconhecida, e
  * tests/casas.test.ts falha se as duas divergirem.
  */

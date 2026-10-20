@@ -1,6 +1,10 @@
 # Rei leão 2027
 
-Comparador das casas de Airbnb para o réveillon de 30/12/2026 a 03/01/2027,
-com o custo real por pessoa (hospedagem + combustível + comida) recalculado ao vivo.
+Réveillon de 30/12/2026 a 03/01/2027 na Casa Primavera (Santana do Riacho,
+Serra do Cipó), com o custo real por pessoa (hospedagem + combustível + comida)
+recalculado ao vivo.
 
-Página estática, sem build. Publicada em GitHub Pages a partir de `index.html`.
+- `index.html` — a casa que o grupo fechou e a conta por pessoa.
+- `casas.html` — o comparador das 20 casas que estavam na disputa, com a votação.
+
+Páginas estáticas, sem build. Publicadas em GitHub Pages a partir da raiz.

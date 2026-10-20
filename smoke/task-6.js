@@ -67,7 +67,8 @@ function formatarEstadoVoto({ sim, nao, saldo, meu }) {
 const sel = (casa, v) => `[data-voto-casa="${casa}"] [data-voto="${v}"]`;
 
 // --- ambiente: aponta pra API local e começa sem voto nenhum -------------
-const page = await openTab(BASE);
+// O comparador mora em casas.html desde que a raiz virou a página da casa fechada.
+const page = await openTab(`${BASE}/casas.html`);
 await page.evaluate((api) => {
   localStorage.clear();
   localStorage.setItem('rl_api', api);
